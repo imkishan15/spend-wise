@@ -1,59 +1,62 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useReducer, useEffect } from "react";
 import Navbar from "./components/Navbar.jsx";
 import SummaryCards from "./components/SummaryCards.jsx";
 import Filter from "./components/Filter.jsx";
 import ExpenseTable from "./components/ExpenseTable.jsx";
 import CategoryChart from "./components/CategoryChart.jsx";
-
-const API_URL = "http://localhost:5000/api/expenses";
+import AddExpenseForm from "./components/AddExpenseForm.jsx";
+import { expenseReducer, initialState, ACTIONS } from "./reducer/expenseReducer.js";
+import * as expenseApi from "./api/expenseApi.js";
 
 function App() {
-  const [expenses, setExpenses] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  // Bonus: monthly filter and sorting state
-  const [selectedMonth, setSelectedMonth] = useState("All");
-  const [sortBy, setSortBy] = useState("none");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [state, dispatch] = useReducer(expenseReducer, initialState);
+  const { expenses, loading, error, categoryFilter, monthFilter, sortBy, sortOrder } = state;
 
   // Fetch all expenses when the page loads
   useEffect(() => {
-    axios.get(API_URL).then((response) => {
-      setExpenses(response.data);
-    });
+    dispatch({ type: ACTIONS.FETCH_INIT });
+    expenseApi
+      .fetchExpenses()
+      .then((data) => dispatch({ type: ACTIONS.FETCH_SUCCESS, payload: data }))
+      .catch((err) => dispatch({ type: ACTIONS.FETCH_ERROR, payload: err.message }));
   }, []);
 
-  // Update a transaction (Edit button in the table)
+  function handleAdd(newExpense) {
+    expenseApi.createExpense(newExpense).then((created) => {
+      dispatch({ type: ACTIONS.ADD_EXPENSE, payload: created });
+    });
+  }
+
   function handleUpdate(id, updatedFields) {
-    axios.put(`${API_URL}/${id}`, updatedFields).then((response) => {
-      setExpenses(
-        expenses.map((expense) => (expense.id === id ? response.data : expense))
-      );
+    expenseApi.updateExpense(id, updatedFields).then((updated) => {
+      dispatch({ type: ACTIONS.UPDATE_EXPENSE, payload: updated });
     });
   }
 
-  // Delete a transaction (Delete button in the table)
   function handleDelete(id) {
-    axios.delete(`${API_URL}/${id}`).then(() => {
-      setExpenses(expenses.filter((expense) => expense.id !== id));
+    expenseApi.deleteExpense(id).then(() => {
+      dispatch({ type: ACTIONS.DELETE_EXPENSE, payload: id });
     });
   }
 
-  // ----- STEP 1: Filter by category -----
+  function handleSortChange(newSortBy, newSortOrder) {
+    dispatch({ type: ACTIONS.SET_SORT, payload: { sortBy: newSortBy, sortOrder: newSortOrder } });
+  }
+
+  // ----- Filter by category -----
   let filteredExpenses = expenses.filter((expense) => {
-    if (selectedCategory === "All") return true;
-    return expense.category === selectedCategory;
+    if (categoryFilter === "All") return true;
+    return expense.category === categoryFilter;
   });
 
-  // ----- Bonus: Filter by month -----
+  // ----- Filter by month -----
   filteredExpenses = filteredExpenses.filter((expense) => {
-    if (selectedMonth === "All") return true;
+    if (monthFilter === "All") return true;
     const expenseMonth = expense.date.slice(0, 7); // "YYYY-MM"
-    return expenseMonth === selectedMonth;
+    return expenseMonth === monthFilter;
   });
 
-  // ----- Bonus: Sorting -----
+  // ----- Sorting -----
   if (sortBy !== "none") {
     filteredExpenses = [...filteredExpenses].sort((a, b) => {
       let comparison = 0;
@@ -63,27 +66,25 @@ function App() {
     });
   }
 
-  // ----- STEP 2: Total Income -----
+  // ----- Total Income -----
   const totalIncome = filteredExpenses
     .filter((expense) => expense.type === "income")
     .reduce((total, expense) => total + expense.amount, 0);
 
-  // ----- STEP 3: Total Expense -----
+  // ----- Total Expense -----
   const totalExpense = filteredExpenses
     .filter((expense) => expense.type === "expense")
     .reduce((total, expense) => total + expense.amount, 0);
 
-  // ----- STEP 4: Net Income -----
+  // ----- Net Income -----
   const netIncome = totalIncome - totalExpense;
 
-  // ----- STEP 5: Average Expense -----
+  // ----- Average Expense -----
   const expenseTransactions = filteredExpenses.filter((expense) => expense.type === "expense");
   const averageExpense =
-    expenseTransactions.length > 0
-      ? Math.round(totalExpense / expenseTransactions.length)
-      : 0;
+    expenseTransactions.length > 0 ? Math.round(totalExpense / expenseTransactions.length) : 0;
 
-  // ----- STEP 6: Highest Expense -----
+  // ----- Highest Expense -----
   const highestExpense =
     expenseTransactions.length > 0
       ? expenseTransactions.reduce((highest, expense) =>
@@ -91,19 +92,17 @@ function App() {
         )
       : null;
 
-  // Bonus: build a list of unique months (YYYY-MM) for the month filter dropdown
+  // Unique months (YYYY-MM) for the month filter dropdown
   const months = [...new Set(expenses.map((expense) => expense.date.slice(0, 7)))].sort();
-
-  function handleSortChange(newSortBy, newSortOrder) {
-    setSortBy(newSortBy);
-    setSortOrder(newSortOrder);
-  }
 
   return (
     <div className="app">
       <Navbar />
 
       <div className="container">
+        {error && <p className="error-banner">Failed to load expenses: {error}</p>}
+        {loading && <p className="loading-banner">Loading...</p>}
+
         <SummaryCards
           totalIncome={totalIncome}
           totalExpense={totalExpense}
@@ -112,11 +111,13 @@ function App() {
           highestExpense={highestExpense}
         />
 
+        <AddExpenseForm onAdd={handleAdd} />
+
         <Filter
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
+          selectedCategory={categoryFilter}
+          onCategoryChange={(value) => dispatch({ type: ACTIONS.SET_CATEGORY_FILTER, payload: value })}
+          selectedMonth={monthFilter}
+          onMonthChange={(value) => dispatch({ type: ACTIONS.SET_MONTH_FILTER, payload: value })}
           months={months}
           sortBy={sortBy}
           sortOrder={sortOrder}

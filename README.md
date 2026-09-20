@@ -1,21 +1,36 @@
-# Expense Dashboard
+# Expense Dashboard (MongoDB + Layered Backend + Reducer Frontend)
 
-A simple full-stack Expense Dashboard built for a 3rd-semester college evaluation.
-Students practice React state/props, `useEffect`, array methods (`filter`, `reduce`, `find`), and consuming a REST API.
+Full-stack Expense Dashboard, rebuilt on a proper layered backend (route → controller → service → repository → Mongoose/MongoDB) with a `useReducer`-driven frontend. This is the complete, production-shaped version — see the `main` branch for the simple JSON-file version and the `evaluation` branch for the trimmed-down student version.
 
 ## 1. Project Overview
 
-The app shows a list of income/expense transactions fetched from a small Express API (backed by a local JSON file, no database). The dashboard displays 5 summary cards (Total Income, Total Expense, Net Income, Average Expense, Highest Expense), a category filter, and a transaction table with working Edit/Delete.
+Income/expense transactions are stored in MongoDB and served through a REST API with full CRUD (Create, Read, Update, Delete). The dashboard shows 5 summary cards (Total Income, Total Expense, Net Income, Average Expense, Highest Expense), a category + month filter, sorting, a category-wise chart, an "Add Transaction" form, and a table with working Edit/Delete — all state managed through a single `useReducer` instead of scattered `useState` calls.
 
 ## 2. Technologies Used
 
-**Frontend:** React, Vite, JavaScript, plain CSS, Axios
-**Backend:** Node.js, Express.js
-**Data:** Local JSON file (`backend/data/expenses.json`) — no MongoDB, no auth, no Redux
+**Frontend:** React, Vite, JavaScript, plain CSS, Axios, `useReducer`
+**Backend:** Node.js, Express.js, Mongoose (ODM)
+**Data:** MongoDB — no JSON file, no auth, no Redux
 
-## 3. Install Dependencies
+## 3. Backend Architecture
 
-Open two terminals (one for backend, one for frontend).
+```
+backend/
+├── config/db.js                    # Mongoose connection
+├── models/expense.model.js         # Mongoose schema
+├── repositories/expense.repository.js   # Only layer that touches Mongoose/DB
+├── services/expense.service.js     # Business logic, calls repository
+├── controllers/expense.controller.js    # req/res handling, calls service
+├── routes/expense.routes.js        # Maps HTTP verb + path -> controller
+├── seed/expenses.seed.json         # 30 sample transactions
+├── seed.js                         # Wipes and reseeds the database
+├── app.js                          # Express app, middleware, error handler
+└── server.js                       # Connects DB, then starts listening
+```
+
+Each layer only calls the one below it: **route → controller → service → repository → Mongoose model**.
+
+## 4. Install Dependencies
 
 ```bash
 # Backend
@@ -27,16 +42,40 @@ cd frontend
 npm install
 ```
 
-## 4. Start the Backend
+## 5. Set Up MongoDB
+
+You need a running MongoDB instance (local install, or a free MongoDB Atlas cluster).
+
+```bash
+cd backend
+cp .env.example .env
+# edit .env if your Mongo URI is not the local default
+```
+
+`.env.example`:
+```
+MONGO_URI=mongodb://127.0.0.1:27017/expense-dashboard
+PORT=5000
+```
+
+Seed the database with 30 sample transactions:
+
+```bash
+cd backend
+npm run seed
+```
+
+## 6. Start the Backend
 
 ```bash
 cd backend
 npm start
+# or: npm run dev   (auto-restarts on file changes)
 ```
 
 Backend runs at: `http://localhost:5000`
 
-## 5. Start the Frontend
+## 7. Start the Frontend
 
 ```bash
 cd frontend
@@ -45,55 +84,63 @@ npm run dev
 
 Frontend runs at: `http://localhost:5173`
 
-Make sure the backend is running first, so the dashboard can fetch data.
+## 8. API Endpoints
 
-## 6. API Endpoints
+| Method | Endpoint             | Description                    |
+|--------|-----------------------|---------------------------------|
+| GET    | `/api/expenses`       | Get all transactions           |
+| GET    | `/api/expenses/:id`   | Get one transaction by id      |
+| POST   | `/api/expenses`       | Create a new transaction       |
+| PUT    | `/api/expenses/:id`   | Update a transaction           |
+| DELETE | `/api/expenses/:id`   | Delete a transaction           |
 
-| Method | Endpoint             | Description                |
-|--------|-----------------------|----------------------------|
-| GET    | `/api/expenses`       | Get all transactions       |
-| PUT    | `/api/expenses/:id`   | Update a transaction       |
-| DELETE | `/api/expenses/:id`   | Delete a transaction       |
+Invalid ids return `400`, missing transactions return `404`, schema validation failures (bad `category`/`type`) return `400` with a message.
 
-Edit and Delete are already fully implemented in the starter project — students do not need to build these.
+## 9. Frontend State Management
 
-## 7. Student Evaluation Requirements (Mandatory)
+All dashboard state (transactions, loading/error, category filter, month filter, sort) lives in one `useReducer` in `App.jsx`:
 
-Implement the following inside `frontend/src/App.jsx` (and `SummaryCards.jsx` / `Filter.jsx` where noted):
+- `frontend/src/reducer/expenseReducer.js` — action types, initial state, reducer function
+- `frontend/src/api/expenseApi.js` — the only place that calls axios
+- `App.jsx` dispatches actions (`FETCH_SUCCESS`, `ADD_EXPENSE`, `UPDATE_EXPENSE`, `DELETE_EXPENSE`, `SET_CATEGORY_FILTER`, `SET_MONTH_FILTER`, `SET_SORT`) instead of calling multiple `setState` functions.
 
-1. **Total Income** — sum of all transactions where `type === "income"`
-2. **Total Expense** — sum of all transactions where `type === "expense"`
-3. **Net Income** — `Total Income - Total Expense`
-4. **Average Expense** — average amount of all expense transactions
-5. **Highest Expense** — the single transaction with the largest expense amount
-6. **Category Filter** — filter the transaction table (and the 5 KPIs above) by category
+## 10. Features (all implemented)
 
-Look for the `// TODO` comments in the code — that's exactly where each piece belongs.
-
-## 8. Bonus Requirements (Optional)
-
-If you finish early:
-
-1. **Monthly Filter** — filter transactions by month
-2. **Sorting** — sort transactions by Amount or Date, ascending/descending
-3. **Expense Chart** — a simple category-wise expense chart (plain CSS bars are fine, no library required)
+- Total Income, Total Expense, Net Income, Average Expense, Highest Expense
+- Category filter + month filter (both update the table and the KPI cards)
+- Sort by Amount or Date, ascending/descending
+- Category-wise expense chart (plain CSS bars)
+- Add Transaction form (POST)
+- Edit and Delete (PUT/DELETE)
 
 ## Project Structure
 
 ```
 spend-wise/
 ├── backend/
-│   ├── data/
-│   │   └── expenses.json
+│   ├── config/db.js
+│   ├── models/expense.model.js
+│   ├── repositories/expense.repository.js
+│   ├── services/expense.service.js
+│   ├── controllers/expense.controller.js
+│   ├── routes/expense.routes.js
+│   ├── seed/expenses.seed.json
+│   ├── seed.js
+│   ├── app.js
 │   ├── server.js
+│   ├── .env.example
 │   └── package.json
 ├── frontend/
 │   ├── src/
+│   │   ├── api/expenseApi.js
+│   │   ├── reducer/expenseReducer.js
 │   │   ├── components/
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── SummaryCards.jsx
 │   │   │   ├── ExpenseTable.jsx
-│   │   │   └── Filter.jsx
+│   │   │   ├── Filter.jsx
+│   │   │   ├── CategoryChart.jsx
+│   │   │   └── AddExpenseForm.jsx
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── main.jsx

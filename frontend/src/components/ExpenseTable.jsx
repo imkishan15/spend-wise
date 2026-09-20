@@ -8,7 +8,7 @@ function ExpenseTable({ transactions, onUpdate, onDelete }) {
   const [editForm, setEditForm] = useState({ title: "", amount: "", category: "" });
 
   function startEditing(transaction) {
-    setEditingId(transaction.id);
+    setEditingId(transaction._id);
     setEditForm({
       title: transaction.title,
       amount: transaction.amount,
@@ -51,8 +51,8 @@ function ExpenseTable({ transactions, onUpdate, onDelete }) {
         )}
 
         {transactions.map((transaction) => (
-          <tr key={transaction.id}>
-            {editingId === transaction.id ? (
+          <tr key={transaction._id}>
+            {editingId === transaction._id ? (
               // Editing mode: show input fields
               <>
                 <td>
@@ -70,7 +70,7 @@ function ExpenseTable({ transactions, onUpdate, onDelete }) {
                   />
                 </td>
                 <td>{transaction.type}</td>
-                <td>{transaction.date}</td>
+                <td>{transaction.date.slice(0, 10)}</td>
                 <td>
                   <input
                     type="number"
@@ -79,7 +79,7 @@ function ExpenseTable({ transactions, onUpdate, onDelete }) {
                   />
                 </td>
                 <td className="actions">
-                  <button className="save-btn" onClick={() => saveEditing(transaction.id)}>
+                  <button className="save-btn" onClick={() => saveEditing(transaction._id)}>
                     Save
                   </button>
                   <button className="cancel-btn" onClick={cancelEditing}>
@@ -95,13 +95,13 @@ function ExpenseTable({ transactions, onUpdate, onDelete }) {
                 <td>
                   <span className={`type-badge ${transaction.type}`}>{transaction.type}</span>
                 </td>
-                <td>{transaction.date}</td>
+                <td>{transaction.date.slice(0, 10)}</td>
                 <td>₹{transaction.amount.toLocaleString()}</td>
                 <td className="actions">
                   <button className="edit-btn" onClick={() => startEditing(transaction)}>
                     Edit
                   </button>
-                  <button className="delete-btn" onClick={() => onDelete(transaction.id)}>
+                  <button className="delete-btn" onClick={() => onDelete(transaction._id)}>
                     Delete
                   </button>
                 </td>
