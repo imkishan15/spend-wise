@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "title": "Salary",
+    "amount": 50000,
+    "category": "Salary",
+    "type": "income",
+    "date": "2026-01-01"
+  },
+  {
+    "id": 2,
+    "title": "Freelance Project",
+    "amount": 8000,
+    "category": "Salary",
+    "type": "income",
+    "date": "2026-01-15"
+  },
+  {
+    "id": 3,
+    "title": "Groceries",
+    "amount": 2200,
+    "category": "Food",
+    "type": "expense",
+    "date": "2026-01-05"
+  },
+  {
+    "id": 4,
+    "title": "Restaurant Dinner",
+    "amount": 950,
+    "category": "Food",
+    "type": "expense",
+    "date": "2026-01-12"
+  },
+  {
+    "id": 5,
+    "title": "Bus Pass",
+    "amount": 600,
+    "category": "Travel",
+    "type": "expense",
+    "date": "2026-01-18"
+  },
+  {
+    "id": 6,
+    "title": "Electricity Bill",
+    "amount": 1800,
+    "category": "Bills",
+    "type": "expense",
+    "date": "2026-01-20"
+  },
+  {
+    "id": 7,
+    "title": "Movie Night",
+    "amount": 500,
+    "category": "Entertainment",
+    "type": "expense",
+    "date": "2026-01-25"
+  },
+  {
+    "id": 8,
+    "title": "New Shoes",
+    "amount": 2400,
+    "category": "Shopping",
+    "type": "expense",
+    "date": "2026-01-28"
+  },
+  {
+    "id": 9,
+    "title": "Salary",
+    "amount": 50000,
+    "category": "Salary",
+    "type": "income",
+    "date": "2026-02-01"
+  },
+  {
+    "id": 10,
+    "title": "Groceries",
+    "amount": 2500,
+    "category": "Food",
+    "type": "expense",
+    "date": "2026-02-06"
+  },
+  {
+    "id": 11,
+    "title": "Train Ticket",
+    "amount": 1200,
+    "category": "Travel",
+    "type": "expense",
+    "date": "2026-02-10"
+  },
+  {
+    "id": 12,
+    "title": "Mobile Recharge",
+    "amount": 400,
+    "category": "Bills",
+    "type": "expense",
+    "date": "2026-02-14"
+  },
+  {
+    "id": 13,
+    "title": "Netflix Subscription",
+    "amount": 500,
+    "category": "Entertainment",
+    "type": "expense",
+    "date": "2026-02-16"
+  },
+  {
+    "id": 14,
+    "title": "Birthday Gift",
+    "amount": 1500,
+    "category": "Shopping",
+    "type": "expense",
+    "date": "2026-02-20"
+  },
+  {
+    "id": 15,
+    "title": "Water Bill",
+    "amount": 350,
+    "category": "Bills",
+    "type": "expense",
+    "date": "2026-02-22"
+  },
+  {
+    "id": 16,
+    "title": "Salary",
+    "amount": 52000,
+    "category": "Salary",
+    "type": "income",
+    "date": "2026-03-01"
+  },
+  {
+    "id": 17,
+    "title": "Scholarship",
+    "amount": 5000,
+    "category": "Other",
+    "type": "income",
+    "date": "2026-03-03"
+  },
+  {
+    "id": 18,
+    "title": "Groceries",
+    "amount": 2100,
+    "category": "Food",
+    "type": "expense",
+    "date": "2026-03-07"
+  },
+  {
+    "id": 19,
+    "title": "Cab Ride",
+    "amount": 750,
+    "category": "Travel",
+    "type": "expense",
+    "date": "2026-03-11"
+  },
+  {
+    "id": 20,
+    "title": "Clothes Shopping",
+    "amount": 3200,
+    "category": "Shopping",
+    "type": "expense",
+    "date": "2026-03-15"
+  },
+  {
+    "id": 21,
+    "title": "Concert Ticket",
+    "amount": 2000,
+    "category": "Entertainment",
+    "type": "expense",
+    "date": "2026-03-19"
+  },
+  {
+    "id": 22,
+    "title": "Internet Bill",
+    "amount": 999,
+    "category": "Bills",
+    "type": "expense",
+    "date": "2026-03-23"
+  },
+  {
+    "id": 23,
+    "title": "Salary",
+    "amount": 52000,
+    "category": "Salary",
+    "type": "income",
+    "date": "2026-04-01"
+  },
+  {
+    "id": 24,
+    "title": "Groceries",
+    "amount": 2600,
+    "category": "Food",
+    "type": "expense",
+    "date": "2026-04-05"
+  },
+  {
+    "id": 25,
+    "title": "Fuel",
+    "amount": 1800,
+    "category": "Travel",
+    "type": "expense",
+    "date": "2026-04-09"
+  },
+  {
+    "id": 26,
+    "title": "Gym Membership",
+    "amount": 1200,
+    "category": "Other",
+    "type": "expense",
+    "date": "2026-04-13"
+  },
+  {
+    "id": 27,
+    "title": "Book Purchase",
+    "amount": 650,
+    "category": "Shopping",
+    "type": "expense",
+    "date": "2026-04-17"
+  },
+  {
+    "id": 28,
+    "title": "Streaming Bundle",
+    "amount": 700,
+    "category": "Entertainment",
+    "type": "expense",
+    "date": "2026-04-21"
+  },
+  {
+    "id": 29,
+    "title": "Interest Income",
+    "amount": 1200,
+    "category": "Other",
+    "type": "income",
+    "date": "2026-04-25"
+  },
+  {
+    "id": 30,
+    "title": "Laptop Repair",
+    "amount": 3500,
+    "category": "Other",
+    "type": "expense",
+    "date": "2026-04-28"
+  }
+]
